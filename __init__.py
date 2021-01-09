@@ -178,7 +178,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.label_message.setText("Finised.");
 		self.update();
 
-		cmd.load_callback(pymol_obj_loader.myOBJCallback(tmp_outfile),objnames);
+		cmd.load_callback(pymol_obj_loader.myOBJCallback(tmp_outfile),output_modelname);
 		cmd.set_view(my_view);
 		
 		
