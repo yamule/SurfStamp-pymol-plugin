@@ -26,7 +26,7 @@ https://github.com/yamule/SurfStamp-public
 
 
 ## License
-[Apache License 2.0]
-(c) yamule
-[BSD 2-Clause License] (for PyMOL Demo Plugin)  
-(c) Copyright (c) 2018, Schrodinger, Inc.
+[Apache License 2.0]  
+(c) yamule  
+[BSD 2-Clause License] (for PyMOL Demo Plugin)    
+Copyright (c) 2018, Schrodinger, Inc.
