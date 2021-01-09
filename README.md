@@ -17,7 +17,7 @@
 ## Usage
 1. git clone https://github.com/yamule/SurfStamp-pymol-plugin  
 2. Launch PyMOL  
-3. Plugin -> Plugin Manager -> Install New Plugin -> Install from local file -> Select \_\_init\_\_.py in the git folder you made at step 2.   
+3. Plugin -> Plugin Manager -> Install New Plugin -> Install from local file -> Select \_\_init\_\_.py in the git folder you(git) made at step 1.   
 4. Plugin -> SurfStamp  
 
 
