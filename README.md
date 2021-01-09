@@ -5,19 +5,17 @@
 
  - PyMOL 2.x  
  -  Java Runtime Environment  
-
-
-**+Some Python Modules**  
- - numpy  
- - pyopengl  
- - pyopengl-accelerate  
- - pillow  
+ - **Some Python Modules**  
+    - numpy  
+    - pyopengl  
+    - pyopengl-accelerate  
+    - pillow  
 
 
 ## Usage
-1. git clone https://github.com/yamule/SurfStamp-pymol-plugin  
+1.`git clone https://github.com/yamule/SurfStamp-pymol-plugin`  
 2. Launch PyMOL  
-3. Plugin -> Plugin Manager -> Install New Plugin -> Install from local file -> Select \_\_init\_\_.py in the git folder you(git) made at step 1.   
+3. Plugin -> Plugin Manager -> Install New Plugin -> Install from local file -> [Select \_\_init\_\_.py in the git folder you(git) made at step 1.]   
 4. Plugin -> SurfStamp  
 
 
