@@ -130,14 +130,14 @@ class SurfStampFrame(QtWidgets.QWidget):
 		
 		modelname = self.combo_model.currentText();
 		
-		modelnames = cmd.get_object_list("*");
-		modelnames_hs={};
-		for mm in modelnames:
-			modelnames_hs[mm] = 100;
+		usednames = cmd.get_names();
+		usednames_hs={};
+		for mm in usednames:
+			usednames_hs[mm] = 100;
 
 		output_modelname = modelname+"_obj";
 		cou = 1;
-		while output_modelname in modelnames_hs:
+		while output_modelname in usednames_hs:
 			output_modelname = modelname+"_"+str(cou)+"_obj";
 			cou += 1;
 
