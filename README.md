@@ -1,6 +1,6 @@
 # SurfStamp PyMOL Plugin
 
-
+![example](https://raw.githubusercontent.com/yamule/SurfStamp-pymol-plugin/master/image/screenshot.png)　　
 ## Requirements
 
 PyMOL 2.x  
@@ -19,8 +19,12 @@ pillow
 4. Plugin -> SurfStamp  
 
 
+## Try SurfStamp with much more flexible options
+https://github.com/yamule/SurfStamp-public
+
+
 ## License
 [Apache License 2.0]
 (c) yamule
-[BSD 2-Clause License] for PyMOL Demo Plugin  
+[BSD 2-Clause License] (for PyMOL Demo Plugin)  
 (c) Copyright (c) 2018, Schrodinger, Inc.
