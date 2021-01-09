@@ -139,7 +139,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		output_modelname = modelname+"_obj";
 		cou = 1;
 		while output_modelname in usednames_hs:
-			output_modelname = modelname+"_"+str(cou)+"_obj";
+			output_modelname = modelname+"_obj"+"_"+str(cou);
 			cou += 1;
 
 		surf_args = ["java","-jar",surfstamp_jar];
