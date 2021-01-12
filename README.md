@@ -4,8 +4,8 @@
 ## Requirements
 
  - PyMOL 2.x (with pyQt5, https://github.com/schrodinger/pymol-open-source)  
- -  Java Runtime Environment (Something like `sudo apt-get install openjdk-8-jre`)  
- - **Some Python Modules** (Something like `pip install XXX` or `conda install XXX`)  
+ -  Java Runtime Environment (Install with the command like `sudo apt-get install openjdk-8-jre`)  
+ - **Some Python Modules** (Install with the command `pip install XXX` or `conda install XXX`)  
     - numpy  
     - pyopengl  
     - pyopengl-accelerate  
