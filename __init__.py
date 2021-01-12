@@ -21,8 +21,9 @@ from . import pymol_obj_loader
 # Avoid importing "expensive" modules here (e.g. scipy), since this code is
 # executed on PyMOL's startup. Only import such modules inside functions.
 
-import os
-
+import os;
+import re;
+import sys;
 
 # entry point to PyMOL's API
 from pymol import cmd
@@ -104,8 +105,11 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.closeButton.clicked.connect(self.hide);
 		self.layout.addWidget(self.closeButton);
 		
+		screengeom = QtWidgets.qApp.desktop().screenGeometry();
 
-		self.setGeometry(300, 300, 250, 150)
+		wwidth = 250;
+		hheight = 300;
+		self.setGeometry(screengeom.width()/2-wwidth/2,screengeom.height()/2-hheight/2,wwidth,hheight)
 		self.setWindowTitle('SurfStamp')
 		self.show()
 		
@@ -114,6 +118,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		
 		import threading
 		self.label_message.setText("Please wait...");
+		self.okButton.setEnabled(False);
 		self.update();
 		thread1 = threading.Thread(target=self.runSurfStamp_);
 		thread1.start();
@@ -135,11 +140,11 @@ class SurfStampFrame(QtWidgets.QWidget):
 		usednames_hs={};
 		for mm in usednames:
 			usednames_hs[mm] = 100;
-
-		output_modelname = modelname+"_obj";
+		output_modelname = re.sub("[^A-Za-z0-9\\.\\-]","_",modelname)+"_obj";
 		cou = 1;
 		while output_modelname in usednames_hs:
 			output_modelname = modelname+"_obj"+"_"+str(cou);
+			#cmd.get_unused_name("XXX"); というのもある？
 			cou += 1;
 
 		surf_args = ["java","-jar",surfstamp_jar];
@@ -153,6 +158,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		else:
 			tmp_infile = tmpdir.name+"/tmpin.pdb";
 			cmd.save(tmp_infile,modelname);
+			
 			surf_args.extend(["-pdb",tmp_infile]);
 			
 		surf_args.extend(["-surface_resolution",str(self.spin_reso.value())]);
@@ -176,6 +182,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		os.system(" ".join(surf_args)+" >&2 ");
 		
 		self.label_message.setText("Finised.");
+		self.okButton.setEnabled(True);
 		self.update();
 
 		cmd.load_callback(pymol_obj_loader.myOBJCallback(tmp_outfile),output_modelname);
@@ -204,7 +211,16 @@ def run_plugin_gui():
 	if surf_dialog is None:
 		surf_dialog = make_dialog();
 	surf_dialog.combo_model.clear();
-	surf_dialog.combo_model.addItems(cmd.get_object_list("*"));
+	
+	surf_dialog.combo_model.addItems(cmd.get_object_list("(all)"));
+	
+	try :
+		sll = cmd.get_names("selections");
+		if len(sll) > 0:
+			surf_dialog.combo_model.addItems(sll);
+	except:
+		print("",end="");
+
 	surf_dialog.show();
 
 
