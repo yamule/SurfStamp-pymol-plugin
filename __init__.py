@@ -47,6 +47,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.setLayout(self.layout)
 		
 		
+		glayout1 = QtWidgets.QGridLayout();
 		self.label_message = QtWidgets.QLabel(self);
 		self.label_message.setText("SurfStamp PyMOL plugin");
 		self.layout.addWidget(self.label_message);
@@ -60,37 +61,49 @@ class SurfStampFrame(QtWidgets.QWidget):
 
 		self.label_reso = QtWidgets.QLabel(self);
 		self.label_reso.setText("Surface Resolution");
-		self.layout.addWidget(self.label_reso);
+		glayout1.addWidget(self.label_reso,1,0);
 		self.spin_reso = QtWidgets.QDoubleSpinBox (self)
 		self.spin_reso.setRange(0.1,2.0);
 		self.spin_reso.setSingleStep(0.05);
 		self.spin_reso.setValue(0.7);
-		self.layout.addWidget(self.spin_reso);
-		
+		glayout1.addWidget(self.spin_reso,1,1);
 		
 		self.label_imagesize = QtWidgets.QLabel(self);
 		self.label_imagesize.setText("Image Size");
-		self.layout.addWidget(self.label_imagesize);
+		glayout1.addWidget(self.label_imagesize,2,0);
 		self.spin_imagesize = QtWidgets.QSpinBox(self);
 		self.spin_imagesize.setRange(500,15000);
 		self.spin_imagesize.setSingleStep(10);
 		self.spin_imagesize.setValue(4000);
-		self.layout.addWidget(self.spin_imagesize);
+		glayout1.addWidget(self.spin_imagesize,2,1);
 		
 		
+		
+		glayout2 = QtWidgets.QGridLayout();
 		self.check_outline = QtWidgets.QCheckBox('Outline')
 		self.check_outline.setChecked(True);
-		self.layout.addWidget(self.check_outline);
+		glayout2.addWidget(self.check_outline,0,0);
 		
 		self.check_nowater = QtWidgets.QCheckBox('Remove Water')
 		self.check_nowater.setChecked(True);
-		self.layout.addWidget(self.check_nowater);
+		glayout2.addWidget(self.check_nowater,0,1);
+		
+		self.check_colorall = QtWidgets.QCheckBox('Color All')
+		self.check_colorall.setChecked(False);
+		glayout2.addWidget(self.check_colorall,1,0);
+
+		self.check_tile = QtWidgets.QCheckBox('Repeating Tile')
+		self.check_tile.setChecked(False);
+		glayout2.addWidget(self.check_tile,1,1);
 		
 		self.check_oneletter = QtWidgets.QCheckBox('One Letter');
-		self.layout.addWidget(self.check_oneletter);
+		glayout2.addWidget(self.check_oneletter,2,0);
 		
 		self.check_nochainname = QtWidgets.QCheckBox('No Chain Name');
-		self.layout.addWidget(self.check_nochainname);
+		glayout2.addWidget(self.check_nochainname,2,1);
+		
+		self.check_ignore_occupancy = QtWidgets.QCheckBox('Ignore Occupancy');
+		glayout2.addWidget(self.check_ignore_occupancy,3,0);
 		
 		
 		#MMCIF は AUTH が不完全だ！
@@ -98,17 +111,23 @@ class SurfStampFrame(QtWidgets.QWidget):
 		#self.layout.addWidget(self.check_label);
 		
 		
+		glayout3 = QtWidgets.QGridLayout();
 		self.okButton = QtWidgets.QPushButton('Create');
-		self.layout.addWidget(self.okButton);
 		self.okButton.clicked.connect(self.runSurfStamp);
+		glayout3.addWidget(self.okButton,0,0);
+
 		self.closeButton = QtWidgets.QPushButton('Close')
 		self.closeButton.clicked.connect(self.hide);
-		self.layout.addWidget(self.closeButton);
+		glayout3.addWidget(self.closeButton,0,1);
 		
+		self.layout.addLayout(glayout1);
+		self.layout.addLayout(glayout2);
+		self.layout.addLayout(glayout3);
+
 		screengeom = QtWidgets.qApp.desktop().screenGeometry();
 
-		wwidth = 250;
-		hheight = 300;
+		wwidth = 300;
+		hheight = 200;
 		self.setGeometry(screengeom.width()/2-wwidth/2,screengeom.height()/2-hheight/2,wwidth,hheight)
 		self.setWindowTitle('SurfStamp')
 		self.show()
@@ -174,6 +193,12 @@ class SurfStampFrame(QtWidgets.QWidget):
 			surf_args.extend(["-residue_oneletter"]);
 		if self.check_nochainname.isChecked():
 			surf_args.extend(["-nochainname"]);
+		if self.check_tile.isChecked():
+			surf_args.extend(["-tile","-no_sep"]);
+		if self.check_colorall.isChecked():
+			surf_args.extend(["-color_missing","-color_chainbreak"]);
+		if self.check_ignore_occupancy.isChecked():
+			surf_args.extend(["-ignore_occupancy"]);
 
 
 		#import subprocess;
