@@ -3,9 +3,9 @@
 ![example](https://raw.githubusercontent.com/yamule/SurfStamp-pymol-plugin/master/image/screenshot.png)　　
 ## Requirements
 
- - PyMOL 2.x  
- -  Java Runtime Environment  
- - **Some Python Modules**  
+ - PyMOL 2.x (with pyQt5, https://github.com/schrodinger/pymol-open-source)  
+ -  Java Runtime Environment (Something like `sudo apt-get install openjdk-8-jre`)  
+ - **Some Python Modules** (Something like `pip install XXX` or `conda install XXX`)  
     - numpy  
     - pyopengl  
     - pyopengl-accelerate  
@@ -20,7 +20,7 @@
 
 
 ## Try SurfStamp with much more flexible options
-https://github.com/yamule/SurfStamp-public
+https://github.com/yamule/SurfStamp-public  
 
 
 ## License

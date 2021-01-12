@@ -84,7 +84,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.check_outline.setChecked(True);
 		glayout2.addWidget(self.check_outline,0,0);
 		
-		self.check_nowater = QtWidgets.QCheckBox('Remove Water')
+		self.check_nowater = QtWidgets.QCheckBox('Remove Waters')
 		self.check_nowater.setChecked(True);
 		glayout2.addWidget(self.check_nowater,0,1);
 		
