@@ -104,6 +104,8 @@ class SurfStampFrame(QtWidgets.QWidget):
 		
 		self.check_ignore_occupancy = QtWidgets.QCheckBox('Ignore Occupancy');
 		glayout2.addWidget(self.check_ignore_occupancy,3,0);
+		self.check_cartoon = QtWidgets.QCheckBox('Cartoon');
+		glayout2.addWidget(self.check_cartoon,3,1);
 		
 		
 		#MMCIF は AUTH が不完全だ！
@@ -170,6 +172,28 @@ class SurfStampFrame(QtWidgets.QWidget):
 		
 		surf_args.extend(["-out",tmp_outfile]);
 		
+		if self.check_cartoon.isChecked():
+			cmd.set_view(
+			(0.9999905824661255, -0.00367919635027647, -0.002306032460182905
+			, 0.003680833615362644, 0.9999929666519165, 0.0007080769282765687
+			, 0.0023034177720546722, -0.0007165365968830884, 0.999997079372406
+			, 0.0, 0.0, -50.0
+			, 0.0, 0.0, 0.0, 40.0, 100.0, -20.0));
+
+			cmd.hide("all");
+			cmd.show("cartoon",modelname);
+			cmd.reset();
+			cmd.origin(position=[0.0,0.0,0.0]);
+			cmd.center(origin = 0);
+			cmd.pseudoatom("pseudo_",pos=[0,0,0]);
+			cmd.select("psel","/pseudo_//P/PSD`1/PS1");
+			cmd.center(selection="psel");
+			cmd.save(tmpdir.name+"/tmpin.obj",modelname);
+			cmd.delete("pseudo_");
+			#cmd.delete("(psel)");#選択の消し方が不明
+			surf_args.extend(["-obj",tmpdir.name+"/tmpin.obj"]);
+			surf_args.extend(["-use_ca","-force","-sep_block","-font_size","20"]);
+			cmd.hide("everything",modelname);
 		if False:
 			tmp_infile = tmpdir.name+"/tmpin.cif";
 			surf_args.extend(["-mmcif_use_label",tmp_infile]);
@@ -199,7 +223,6 @@ class SurfStampFrame(QtWidgets.QWidget):
 			surf_args.extend(["-color_missing","-color_chainbreak"]);
 		if self.check_ignore_occupancy.isChecked():
 			surf_args.extend(["-ignore_occupancy"]);
-
 
 		#import subprocess;
 		#process = subprocess.run(surf_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT);

@@ -181,7 +181,6 @@ class MTLData:
 		for rr in ret:
 			ret_hs[rr.name] = rr;
 		return ret_hs;
-all_obj = [];
 class OBJData:
 	def __init__(self):
 		self.img = None;
