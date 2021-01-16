@@ -72,8 +72,8 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.label_imagesize.setText("Image Size");
 		glayout1.addWidget(self.label_imagesize,2,0);
 		self.spin_imagesize = QtWidgets.QSpinBox(self);
-		self.spin_imagesize.setRange(500,20000);
-		self.spin_imagesize.setSingleStep(10);
+		self.spin_imagesize.setRange(1000,10000);#PILLOW？は 13000 くらいが Max っぽい
+		self.spin_imagesize.setSingleStep(100);
 		self.spin_imagesize.setValue(4000);
 		glayout1.addWidget(self.spin_imagesize,2,1);
 
@@ -197,6 +197,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		
 		import threading
 		self.label_message.setText("Please wait...");
+		print("Please wait...")
 		self.button_ok.setEnabled(False);
 		self.update();
 		thread1 = threading.Thread(target=self.runSurfStamp_);
@@ -233,7 +234,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		surf_args = ["java","-jar",surfstamp_jar];
 		
 		surf_args.extend(["-out",tmp_outfile]);
-		
+		tmpmodel_created = "";
 		if self.check_cartoon.isChecked():
 			cmd.set_view(
 			(0.9999905824661255, -0.00367919635027647, -0.002306032460182905
@@ -241,7 +242,15 @@ class SurfStampFrame(QtWidgets.QWidget):
 			, 0.0023034177720546722, -0.0007165365968830884, 0.999997079372406
 			, 0.0, 0.0, -50.0
 			, 0.0, 0.0, 0.0, 40.0, 100.0, -20.0));
+			
+			tmpmodel_created = cmd.get_unused_name("tmpmodel_");
+			cmd.load_model(cmd.get_model(modelname),tmpmodel_created);
 
+			activeobjects =  cmd.get_names('public_objects', enabled_only=1);
+			for aa in list(activeobjects):
+				cmd.disable(aa);
+			cmd.enable(tmpmodel_created);
+			modelname = tmpmodel_created;
 			cmd.hide("everything",modelname);
 			cmd.show("cartoon",modelname);
 			cmd.reset();
@@ -256,6 +265,9 @@ class SurfStampFrame(QtWidgets.QWidget):
 			cmd.delete(unusedname);
 			cmd.delete(unused_selectionname);
 
+			for aa in list(activeobjects):
+				cmd.enable(aa);
+
 			surf_args.extend(["-obj",tmpdir.name+"/tmpin.obj"]);
 			surf_args.extend(["-use_ca","-force","-sep_block"]);
 			cmd.hide("everything",modelname);
@@ -266,9 +278,11 @@ class SurfStampFrame(QtWidgets.QWidget):
 		else:
 			tmp_infile = tmpdir.name+"/tmpin.pdb";
 			cmd.save(tmp_infile,modelname);
-			
 			surf_args.extend(["-pdb",tmp_infile]);
-			
+		
+		if len(tmpmodel_created) > 0:
+			cmd.delete(tmpmodel_created);
+
 		surf_args.extend(["-surface_resolution",str(self.spin_reso.value())]);
 		surf_args.extend(["-image_size",str(self.spin_imagesize.value())]);
 		
@@ -294,15 +308,21 @@ class SurfStampFrame(QtWidgets.QWidget):
 		if self.check_ignore_occupancy.isChecked():
 			surf_args.extend(["-ignore_occupancy"]);
 
-		#import subprocess;
-		#process = subprocess.run(surf_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT);
-		#print(process.stdout.decode("utf-8"));
-		os.system(" ".join(surf_args)+" >&2 ");
+		surf_args.extend(["-quiet","1"]);
+		import subprocess;
+		process = subprocess.run(surf_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT);
+		#process = subprocess.run(surf_args, stdout=None, stderr=subprocess.PIPE);
+		print(process.stdout.decode("utf-8"));
+		#os.system(" ".join(surf_args)+" >&2 ");
 		
-		self.label_message.setText("Finised.");
+		self.label_message.setText("Finished.");
+		print("Finished");
 		self.button_ok.setEnabled(True);
 		self.update();
 
+
+		if not re.search("\.obj$",tmp_outfile):
+			tmp_outfile = tmp_outfile+".obj";
 		cmd.load_callback(pymol_obj_loader.myOBJCallback(tmp_outfile),output_modelname);
 		cmd.set_view(my_view);
 		

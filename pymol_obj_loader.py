@@ -126,7 +126,8 @@ class MTLData:
 	def from_list(llist,pdir):
 		mtll = MTLData(pdir);
 		skippednum = 0;
-		for bb in llist:
+		for ll in llist:
+			bb = re_pt.split(ll);
 			tag = bb.pop(0).lower();
 			if tag == "newmtl":
 				mtll.set_name(bb[0]);
@@ -147,11 +148,11 @@ class MTLData:
 			elif tag == "illum":
 				mtll.set_illum(bb[0]);
 			elif tag == "map_kd":
-				mtll.set_map_kd(bb[0]);
+				mtll.set_map_kd(re.sub("^[^\s]+[\s]+","",ll));
 			elif tag == "map_ks":
-				mtll.set_map_ks(bb[0]);
+				mtll.set_map_ks(re.sub("^[^\s]+[\s]+","",ll));
 			elif tag == "map_ka":
-				mtll.set_map_ka(bb[0]);
+				mtll.set_map_ka(re.sub("^[^\s]+[\s]+","",ll));
 			else:
 				skippednum += 1;
 				if len(tag) == 0:
@@ -174,7 +175,7 @@ class MTLData:
 					if len(buff) > 0:
 						ret.append(MTLData.from_list(buff,pdir));
 					buff = [];
-				buff.append(ptt);
+				buff.append(ll);
 		if len(buff) > 0:
 			ret.append(MTLData.from_list(buff,pdir));
 		ret_hs = {};
@@ -210,7 +211,8 @@ class OBJData:
 				ll = re_l.sub("",ll);
 				ptt = re_pt.split(ll);
 				if ptt[0] == "mtllib":
-					mtllib = MTLData.load(parentdir+"/"+ptt[1]);
+					mtlfilename = re.sub("mtllib +","",ll);
+					mtllib = MTLData.load(parentdir+"/"+mtlfilename);
 				elif ptt[0] == "v":
 					v.append([float(ptt[1]),float(ptt[2]),float(ptt[3])]);
 				elif ptt[0] == "vt":
