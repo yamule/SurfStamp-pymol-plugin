@@ -63,7 +63,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.label_reso.setText("Surface Resolution");
 		glayout1.addWidget(self.label_reso,1,0);
 		self.spin_reso = QtWidgets.QDoubleSpinBox (self)
-		self.spin_reso.setRange(0.1,2.0);
+		self.spin_reso.setRange(0.1,1.0);
 		self.spin_reso.setSingleStep(0.05);
 		self.spin_reso.setValue(0.7);
 		glayout1.addWidget(self.spin_reso,1,1);
@@ -72,7 +72,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.label_imagesize.setText("Image Size");
 		glayout1.addWidget(self.label_imagesize,2,0);
 		self.spin_imagesize = QtWidgets.QSpinBox(self);
-		self.spin_imagesize.setRange(500,15000);
+		self.spin_imagesize.setRange(500,20000);
 		self.spin_imagesize.setSingleStep(10);
 		self.spin_imagesize.setValue(4000);
 		glayout1.addWidget(self.spin_imagesize,2,1);
@@ -83,7 +83,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.label_fontsize.setText("Font Size");
 		glayout1.addWidget(self.label_fontsize,3,0);
 		self.spin_fontsize = QtWidgets.QSpinBox(self);
-		self.spin_fontsize.setRange(3,200);
+		self.spin_fontsize.setRange(3,100);
 		self.spin_fontsize.setSingleStep(1);
 		self.spin_fontsize.setValue(20);
 		glayout1.addWidget(self.spin_fontsize,3,1);
@@ -130,7 +130,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		
 		
 		glayout4 = QtWidgets.QVBoxLayout();
-		self.check_outprefix = QtWidgets.QCheckBox('Output Prefix');
+		self.check_outprefix = QtWidgets.QCheckBox('Output Prefix (Prefix+<something> will be overwritten.)');
 		
 		self.check_outprefix.clicked.connect(self.checkOutprefixOn);
 		glayout4.addWidget(self.check_outprefix);
@@ -175,7 +175,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 	def getFile(self):
 		filename = QtWidgets.QFileDialog.getSaveFileName(self,"Output Prefix"
 		,""
-		,"All Files (*)");
+		,"Wavefront OBJ File (*.obj)");
 		if filename:
 			if filename[0]:
 				self.text_outprefix.setText(filename[0]);
@@ -247,12 +247,15 @@ class SurfStampFrame(QtWidgets.QWidget):
 			cmd.reset();
 			cmd.origin(position=[0.0,0.0,0.0]);
 			cmd.center(origin = 0);
-			cmd.pseudoatom("pseudo_",pos=[0,0,0]);
-			cmd.select("psel","/pseudo_//P/PSD`1/PS1");
-			cmd.center(selection="psel");
+			unusedname = cmd.get_unused_name("pseudo_");
+			unused_selectionname = cmd.get_unused_name("pseudo_sel_");
+			cmd.pseudoatom(unusedname,pos=[0,0,0]);
+			cmd.select(unused_selectionname,"/pseudo_//P/PSD`1/PS1");
+			cmd.center(selection=unused_selectionname);
 			cmd.save(tmpdir.name+"/tmpin.obj",modelname);
-			cmd.delete("pseudo_");
-			#cmd.delete("(psel)");#選択の消し方が不明
+			cmd.delete(unusedname);
+			cmd.delete(unused_selectionname);
+
 			surf_args.extend(["-obj",tmpdir.name+"/tmpin.obj"]);
 			surf_args.extend(["-use_ca","-force","-sep_block"]);
 			cmd.hide("everything",modelname);
@@ -335,7 +338,7 @@ def run_plugin_gui():
 			surf_dialog.combo_model.addItems(sll);
 	except:
 		print("",end="");
-
+	surf_dialog.check_outprefix.setChecked(False);
 	surf_dialog.show();
 
 
