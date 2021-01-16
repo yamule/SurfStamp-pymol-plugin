@@ -82,10 +82,10 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.label_fontsize = QtWidgets.QLabel(self);
 		self.label_fontsize.setText("Font Size");
 		glayout1.addWidget(self.label_fontsize,3,0);
-		self.spin_fontsize = QtWidgets.QDoubleSpinBox(self);
+		self.spin_fontsize = QtWidgets.QSpinBox(self);
 		self.spin_fontsize.setRange(3,200);
-		self.spin_fontsize.setSingleStep(0.5);
-		self.spin_fontsize.setValue(20.0);
+		self.spin_fontsize.setSingleStep(1);
+		self.spin_fontsize.setValue(20);
 		glayout1.addWidget(self.spin_fontsize,3,1);
 
 		
@@ -177,7 +177,8 @@ class SurfStampFrame(QtWidgets.QWidget):
 		,""
 		,"All Files (*)");
 		if filename:
-			self.text_outprefix.setText(filename);
+			if filename[0]:
+				self.text_outprefix.setText(filename[0]);
 
 	def checkOutprefixOn(self):
 		if self.check_outprefix.isChecked():
@@ -210,7 +211,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		tmp_outfile = tmpdir.name+"/tmpout.obj";
 		
 		if self.check_outprefix.isChecked():
-			if len(self.text_outprefix.value()):
+			if len(self.text_outprefix.text()):
 				tmp_outfile = self.text_outprefix.text();
 
 		my_view = cmd.get_view();
