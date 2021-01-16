@@ -242,7 +242,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 			, 0.0, 0.0, -50.0
 			, 0.0, 0.0, 0.0, 40.0, 100.0, -20.0));
 
-			cmd.hide("all");
+			cmd.hide("everything",modelname);
 			cmd.show("cartoon",modelname);
 			cmd.reset();
 			cmd.origin(position=[0.0,0.0,0.0]);
@@ -281,7 +281,10 @@ class SurfStampFrame(QtWidgets.QWidget):
 			surf_args.extend(["-nochainname"]);
 
 		if self.check_tile.isChecked():
-			surf_args.extend(["-tile","-no_sep","-font_size",str(self.spin_fontsize.value())]);
+			if self.check_cartoon.isChecked():
+				surf_args.extend(["-tile","-font_size",str(self.spin_fontsize.value())]);
+			else:
+				surf_args.extend(["-tile","-no_sep","-font_size",str(self.spin_fontsize.value())]);
 			
 		if self.check_colorall.isChecked():
 			surf_args.extend(["-color_missing","-color_chainbreak"]);
