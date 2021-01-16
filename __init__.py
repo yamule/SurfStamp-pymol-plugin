@@ -76,6 +76,19 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.spin_imagesize.setSingleStep(10);
 		self.spin_imagesize.setValue(4000);
 		glayout1.addWidget(self.spin_imagesize,2,1);
+
+
+
+		self.label_fontsize = QtWidgets.QLabel(self);
+		self.label_fontsize.setText("Font Size");
+		glayout1.addWidget(self.label_fontsize,3,0);
+		self.spin_fontsize = QtWidgets.QSpinBox(self);
+		self.spin_fontsize.setRange(6,50);
+		self.spin_fontsize.setSingleStep(0.5);
+		self.spin_fontsize.setValue(20.0);
+		glayout1.addWidget(self.spin_fontsize,3,1);
+
+		
 		
 		
 		
@@ -92,7 +105,9 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.check_colorall.setChecked(False);
 		glayout2.addWidget(self.check_colorall,1,0);
 
-		self.check_tile = QtWidgets.QCheckBox('Repeating Tile')
+		self.check_tile = QtWidgets.QCheckBox('Repeating Tile');
+		
+		self.check_tile.clicked.connect(self.checkTileOn);
 		self.check_tile.setChecked(False);
 		glayout2.addWidget(self.check_tile,1,1);
 		
@@ -113,33 +128,75 @@ class SurfStampFrame(QtWidgets.QWidget):
 		#self.layout.addWidget(self.check_label);
 		
 		
-		glayout3 = QtWidgets.QGridLayout();
-		self.okButton = QtWidgets.QPushButton('Create');
-		self.okButton.clicked.connect(self.runSurfStamp);
-		glayout3.addWidget(self.okButton,0,0);
+		
+		glayout4 = QtWidgets.QVBoxLayout();
+		self.check_outprefix = QtWidgets.QCheckBox('Output Prefix');
+		
+		self.check_outprefix.clicked.connect(self.checkOutprefixOn);
+		glayout4.addWidget(self.check_outprefix);
+		glayout4b = QtWidgets.QGridLayout();
+		self.text_outprefix = QtWidgets.QLineEdit(self);
+		self.text_outprefix.setReadOnly(True);
+		glayout4b.addWidget(self.text_outprefix,0,0);
+		
+		self.button_outprefix = QtWidgets.QPushButton(self);
+		self.button_outprefix.setText("Open");
+		
+		self.button_outprefix.clicked.connect(self.getFile);
+		glayout4b.addWidget(self.button_outprefix,0,1);
+		glayout4.addLayout(glayout4b);
 
-		self.closeButton = QtWidgets.QPushButton('Close')
-		self.closeButton.clicked.connect(self.hide);
-		glayout3.addWidget(self.closeButton,0,1);
+
+
+		glayout3 = QtWidgets.QGridLayout();
+		self.button_ok = QtWidgets.QPushButton('Create');
+		self.button_ok.clicked.connect(self.runSurfStamp);
+		glayout3.addWidget(self.button_ok,0,0);
+
+		self.button_close = QtWidgets.QPushButton('Close')
+		self.button_close.clicked.connect(self.hide);
+		glayout3.addWidget(self.button_close,0,1);
 		
 		self.layout.addLayout(glayout1);
 		self.layout.addLayout(glayout2);
+		self.layout.addLayout(glayout4);
 		self.layout.addLayout(glayout3);
 
 		screengeom = QtWidgets.qApp.desktop().screenGeometry();
 
 		wwidth = 300;
 		hheight = 200;
-		self.setGeometry(screengeom.width()/2-wwidth/2,screengeom.height()/2-hheight/2,wwidth,hheight)
-		self.setWindowTitle('SurfStamp')
-		self.show()
+		self.setGeometry(screengeom.width()/2-wwidth/2,screengeom.height()/2-hheight/2,wwidth,hheight);
+		self.setWindowTitle('SurfStamp');
+		self.checkTileOn();
+		self.checkOutprefixOn();
+		self.show();
 		
-		
+	def getFile(self):
+		filename = QtWidgets.QFileDialog.getSaveFileName(self,"Output Prefix"
+		,""
+		,"All Files (*)");
+		if filename:
+			self.out_prefix = filename;
+
+	def checkOutprefixOn(self):
+		if self.check_outprefix.isChecked():
+			self.button_outprefix.setEnabled(True);
+		else:
+			self.button_outprefix.setEnabled(False);
+
+	def checkTileOn(self):
+		if self.check_tile.isChecked():
+			self.spin_fontsize.setEnabled(True);
+		else:
+			self.spin_fontsize.setEnabled(False);
+
+
 	def runSurfStamp(self):
 		
 		import threading
 		self.label_message.setText("Please wait...");
-		self.okButton.setEnabled(False);
+		self.button_ok.setEnabled(False);
 		self.update();
 		thread1 = threading.Thread(target=self.runSurfStamp_);
 		thread1.start();
@@ -152,7 +209,11 @@ class SurfStampFrame(QtWidgets.QWidget):
 		tmpdir = tempfile.TemporaryDirectory();
 		tmp_outfile = tmpdir.name+"/tmpout.obj";
 		
-		my_view = cmd.get_view()
+		if self.check_outprefix.isChecked():
+			if len(self.text_outprefix.value()):
+				tmp_outfile = self.text_outprefix.value();
+
+		my_view = cmd.get_view();
 		
 		modelname = self.combo_model.currentText();
 		
@@ -192,7 +253,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 			cmd.delete("pseudo_");
 			#cmd.delete("(psel)");#選択の消し方が不明
 			surf_args.extend(["-obj",tmpdir.name+"/tmpin.obj"]);
-			surf_args.extend(["-use_ca","-force","-sep_block","-font_size","20"]);
+			surf_args.extend(["-use_ca","-force","-sep_block"]);
 			cmd.hide("everything",modelname);
 		if False:
 			tmp_infile = tmpdir.name+"/tmpin.cif";
@@ -217,8 +278,10 @@ class SurfStampFrame(QtWidgets.QWidget):
 			surf_args.extend(["-residue_oneletter"]);
 		if self.check_nochainname.isChecked():
 			surf_args.extend(["-nochainname"]);
+
 		if self.check_tile.isChecked():
-			surf_args.extend(["-tile","-no_sep"]);
+			surf_args.extend(["-tile","-no_sep","-font_size",str(self.spin_fontsize.value())]);
+			
 		if self.check_colorall.isChecked():
 			surf_args.extend(["-color_missing","-color_chainbreak"]);
 		if self.check_ignore_occupancy.isChecked():
@@ -230,7 +293,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		os.system(" ".join(surf_args)+" >&2 ");
 		
 		self.label_message.setText("Finised.");
-		self.okButton.setEnabled(True);
+		self.button_ok.setEnabled(True);
 		self.update();
 
 		cmd.load_callback(pymol_obj_loader.myOBJCallback(tmp_outfile),output_modelname);
