@@ -333,21 +333,22 @@ def __init_plugin__(app=None):
 	Add an entry to the PyMOL "Plugin" menu
 	'''
 	from pymol.plugins import addmenuitemqt
-	addmenuitemqt('SurfStamp', run_plugin_gui)
+	addmenuitemqt('SurfStamp', run_surfstamp_plugin_gui)
 
 
 # global reference to avoid garbage collection of our dialog
 surf_dialog = None
 
 
-def run_plugin_gui():
+def run_surfstamp_plugin_gui():
 	'''
 	Open our custom dialog
 	'''
 	global surf_dialog
 
 	if surf_dialog is None:
-		surf_dialog = make_dialog();
+		surf_dialog = make_surfstamp_dialog();
+		surf_dialog.setWindowFlags( surf_dialog.windowFlags() | QtCore.Qt.WindowStaysOnTopHint );
 	surf_dialog.combo_model.clear();
 	
 	surf_dialog.combo_model.addItems(cmd.get_object_list("(all)"));
@@ -362,5 +363,5 @@ def run_plugin_gui():
 	surf_dialog.show();
 
 
-def make_dialog():
+def make_surfstamp_dialog():
 	return SurfStampFrame();
