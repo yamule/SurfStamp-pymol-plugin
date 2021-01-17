@@ -280,7 +280,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 			cmd.hide("everything",modelname);
 		if self.check_mmcif.isChecked():
 			tmp_infile = tmpdir.name+"/tmpin.cif";
-			surf_args.extend(["-mmcif_use_label",tmp_infile]);
+			surf_args.extend(["-mmcif_use_label","-mmcif",tmp_infile]);
 			cmd.save(tmp_infile,modelname);
 		else:
 			tmp_infile = tmpdir.name+"/tmpin.pdb";
