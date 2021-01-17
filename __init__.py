@@ -77,8 +77,6 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.spin_imagesize.setValue(4000);
 		glayout1.addWidget(self.spin_imagesize,2,1);
 
-
-
 		self.label_fontsize = QtWidgets.QLabel(self);
 		self.label_fontsize.setText("Font Size");
 		glayout1.addWidget(self.label_fontsize,3,0);
@@ -88,10 +86,6 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.spin_fontsize.setValue(20);
 		glayout1.addWidget(self.spin_fontsize,3,1);
 
-		
-		
-		
-		
 		glayout2 = QtWidgets.QGridLayout();
 		self.check_outline = QtWidgets.QCheckBox('Outline')
 		self.check_outline.setChecked(True);
@@ -120,6 +114,7 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.check_ignore_occupancy = QtWidgets.QCheckBox('Ignore Occupancy');
 		glayout2.addWidget(self.check_ignore_occupancy,3,0);
 		self.check_cartoon = QtWidgets.QCheckBox('Cartoon');
+		self.check_cartoon.clicked.connect(self.checkCartoonOn);
 		glayout2.addWidget(self.check_cartoon,3,1);
 
 		self.check_mmcif = QtWidgets.QCheckBox('Use MMCIF');
@@ -127,32 +122,31 @@ class SurfStampFrame(QtWidgets.QWidget):
 
 		self.check_builtin = QtWidgets.QCheckBox('Built-in Surface Generator');
 		glayout2.addWidget(self.check_builtin,4,1);
-		
+		self.check_builtin.clicked.connect(self.checkBuiltinOn);
 		
 		#MMCIF は AUTH が不完全だ！
 		#self.check_label = QtWidgets.QCheckBox('ID Label');
 		#self.layout.addWidget(self.check_label);
 		
-		
-		
+		# Text field for output file
 		glayout4 = QtWidgets.QVBoxLayout();
-		self.check_outprefix = QtWidgets.QCheckBox('Output Prefix (Prefix+<something> will be overwritten.)');
 		
-		self.check_outprefix.clicked.connect(self.checkOutprefixOn);
-		glayout4.addWidget(self.check_outprefix);
+		self.label_outprefix = QtWidgets.QLabel('Output Prefix (Prefix+<something> will be overwritten.)');
+		glayout4.addWidget(self.label_outprefix);
+		
 		glayout4b = QtWidgets.QGridLayout();
 		self.text_outprefix = QtWidgets.QLineEdit(self);
 		self.text_outprefix.setReadOnly(True);
 		glayout4b.addWidget(self.text_outprefix,0,0);
 		
 		self.button_outprefix = QtWidgets.QPushButton(self);
-		self.button_outprefix.setText("Open");
+		self.button_outprefix.setText("Save As");
 		
 		self.button_outprefix.clicked.connect(self.getFile);
+		self.text_outprefix.setStyleSheet("background-color: lightgray;");
+
 		glayout4b.addWidget(self.button_outprefix,0,1);
 		glayout4.addLayout(glayout4b);
-
-
 
 		glayout3 = QtWidgets.QGridLayout();
 		self.button_ok = QtWidgets.QPushButton('Create');
@@ -175,7 +169,8 @@ class SurfStampFrame(QtWidgets.QWidget):
 		self.setGeometry(screengeom.width()/2-wwidth/2,screengeom.height()/2-hheight/2,wwidth,hheight);
 		self.setWindowTitle('SurfStamp');
 		self.checkTileOn();
-		self.checkOutprefixOn();
+		self.checkBuiltinOn();
+		self.checkCartoonOn();
 		self.show();
 		
 	def getFile(self):
@@ -186,17 +181,25 @@ class SurfStampFrame(QtWidgets.QWidget):
 			if filename[0]:
 				self.text_outprefix.setText(filename[0]);
 
-	def checkOutprefixOn(self):
-		if self.check_outprefix.isChecked():
-			self.button_outprefix.setEnabled(True);
-		else:
-			self.button_outprefix.setEnabled(False);
-
 	def checkTileOn(self):
 		if self.check_tile.isChecked():
 			self.spin_fontsize.setEnabled(True);
 		else:
 			self.spin_fontsize.setEnabled(False);
+
+	def checkCartoonOn(self):
+		if self.check_cartoon.isChecked():
+			self.check_builtin.setEnabled(False);
+			self.spin_reso.setEnabled(False);
+		else:
+			self.check_builtin.setEnabled(True);
+			self.checkBuiltinOn();
+
+	def checkBuiltinOn(self):
+		if self.check_builtin.isChecked():
+			self.spin_reso.setEnabled(True);
+		else:
+			self.spin_reso.setEnabled(False);
 
 
 	def runSurfStamp(self):
@@ -217,10 +220,10 @@ class SurfStampFrame(QtWidgets.QWidget):
 		tmpdir = tempfile.TemporaryDirectory();
 		tmp_outfile = tmpdir.name+"/tmpout.obj";
 		
-		if self.check_outprefix.isChecked():
-			if len(self.text_outprefix.text()):
-				tmp_outfile = self.text_outprefix.text();
 
+		if len(re.sub("[\s]*","",self.text_outprefix.text())) > 0:
+				tmp_outfile = self.text_outprefix.text();
+		
 		my_view = cmd.get_view();
 		
 		modelname = self.combo_model.currentText();
@@ -323,7 +326,8 @@ class SurfStampFrame(QtWidgets.QWidget):
 		#os.system(" ".join(surf_args)+" >&2 ");
 		
 		self.label_message.setText("Finished.");
-		print("Finished");
+		print("Finished.");
+		self.text_outprefix.setText("");
 		self.button_ok.setEnabled(True);
 		self.update();
 
@@ -366,7 +370,8 @@ def run_surfstamp_plugin_gui():
 			surf_dialog.combo_model.addItems(sll);
 	except:
 		print("",end="");
-	surf_dialog.check_outprefix.setChecked(False);
+	surf_dialog.text_outprefix.setText("");
+	surf_dialog.button_ok.setEnabled(True);
 	surf_dialog.show();
 
 
