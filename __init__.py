@@ -277,7 +277,6 @@ class SurfStampFrame(QtWidgets.QWidget):
 				cmd.enable(aa);
 
 			surf_args.extend(["-obj",tmpdir.name+"/tmpin.obj"]);
-			surf_args.extend(["-use_ca","-force","-sep_block"]);
 			cmd.hide("everything",modelname);
 		if self.check_mmcif.isChecked():
 			tmp_infile = tmpdir.name+"/tmpin.cif";
